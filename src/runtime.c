@@ -1,5 +1,9 @@
 #include "runtime.h"
 #include <quickjs.h>
+#include <unistd.h>
+#include <string.h>
+
+// TODO: Better Error Handling 
 
 // **********************************************************
 
@@ -26,7 +30,7 @@ static JSValue js_log_info(JSContext *ctx, JSValue this_val, int argc, JSValue *
 
     printf("[INFO] ");
 
-    if(dummy_print(ctx, argc, argv) < 0 ) {
+    if(dummy_print(ctx, argc, argv) < 0) {
         return JS_EXCEPTION;
     }
 
@@ -38,7 +42,7 @@ static JSValue js_log_warn(JSContext *ctx, JSValue this_val, int argc, JSValue *
 
     printf("[WARN] ");
 
-    if(dummy_print(ctx, argc, argv) < 0 ) {
+    if(dummy_print(ctx, argc, argv) < 0) {
         return JS_EXCEPTION;
     }
 
@@ -50,11 +54,8 @@ static LogFunction log_functions[] = {
     (LogFunction){.name = "warn", .func = js_log_warn, .length = 1},
 };
 
-void runtime_add_log(JSContext *ctx) {
-    JSValue global, log;
-
-    global = JS_GetGlobalObject(ctx);
-    log = JS_NewObject(ctx);
+void runtime_add_log(JSValue *global, JSContext *ctx) {
+    JSValue log = JS_NewObject(ctx);
 
     size_t size_log = sizeof(log_functions) / sizeof(log_functions[0]);
 
@@ -65,23 +66,15 @@ void runtime_add_log(JSContext *ctx) {
     }
 
 
-    JS_SetPropertyStr(ctx, global, "log", log);
-
-    JS_FreeValue(ctx, global);
+    JS_SetPropertyStr(ctx, *global, "log", log);
     return;
 }
 
 
 // **********************************************************
 
-
-void runtime_add_args(JSContext *ctx, int _args, char *argv[]) {
-    JSValue global, args;
-
-    global = JS_GetGlobalObject(ctx);
-
-    args = JS_NewArray(ctx);
-
+void runtime_add_args(JSValue *global, JSContext *ctx, int _args, char *argv[]) {
+    JSValue args = JS_NewArray(ctx);
 
     for(int i = 0; i < _args; i++) {
         JSValue str = JS_NewString(ctx, argv[i]);
@@ -89,7 +82,49 @@ void runtime_add_args(JSContext *ctx, int _args, char *argv[]) {
     }
 
 
-    JS_SetPropertyStr(ctx, global, "args", args);
-    JS_FreeValue(ctx, global);
+    JS_SetPropertyStr(ctx, *global, "args", args);
+    return;
+}
+
+
+// **********************************************************
+
+static JSValue js_internal_run(JSContext *ctx, JSValue this_val, int argc, JSValue *argv) {
+    const char *command = JS_ToCString(ctx, argv[0]);
+    if(!command) {
+        return JS_EXCEPTION;
+    }
+    
+
+    JSValue arr = argv[1];
+    uint32_t len;
+    JSValue val = JS_GetPropertyStr(ctx, arr, "length");
+    JS_ToUint32(ctx, &len, val);
+
+    char *flags[len + 2];
+
+    flags[0] = command;
+    for(uint32_t i = 0; i < len; i++) {
+        val = JS_GetPropertyUint32(ctx, arr, i);
+        const char *str = JS_ToCString(ctx, val);
+
+        flags[i + 1] = strdup(str);
+        JS_FreeCString(ctx, str);
+    }
+
+    flags[len + 1] = NULL;
+
+
+    execvp(command, flags);
+
+    JS_FreeCString(ctx, command);
+    return JS_UNDEFINED;
+}
+
+void runtime_add_run(JSValue *global, JSContext *ctx) {
+
+    JSValue run = JS_NewCFunction(ctx, js_internal_run, "run", 1);
+
+    JS_SetPropertyStr(ctx, *global, "run", run);
     return;
 }

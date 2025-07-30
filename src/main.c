@@ -52,10 +52,6 @@ int read_build_js(char **content) {
 
 int main(int argc, char *argv[]) {
 
-    // for(int i = 0; i < argc; i++) {
-    //     printf("%s\n", argv[i]);
-    // }
-    // return 0;
     char *content;
     if(read_build_js(&content) < 0) {
         return -1;
@@ -65,9 +61,14 @@ int main(int argc, char *argv[]) {
     JSRuntime *runtime = JS_NewRuntime();
     JSContext *ctx     = JS_NewContext(runtime);
 
-    runtime_add_log(ctx);
-    runtime_add_args(ctx, argc, argv);
+    JSValue global = JS_GetGlobalObject(ctx);
 
+    runtime_add_log(&global, ctx);
+    runtime_add_args(&global, ctx, argc, argv);
+    runtime_add_run(&global, ctx);
+
+    JS_FreeValue(ctx, global);
+    
     JS_Eval(ctx, content, strlen(content), "<build>", JS_EVAL_TYPE_GLOBAL);
 
     if(JS_HasException(ctx)) {

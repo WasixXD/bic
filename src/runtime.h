@@ -11,8 +11,10 @@ typedef struct LogFunction {
 } LogFunction;
 
 
-void runtime_add_log(JSContext *ctx);
+void runtime_add_log(JSValue *global, JSContext *ctx);
 
-void runtime_add_args(JSContext *ctx, int args, char *argv[]);
+void runtime_add_args(JSValue *global, JSContext *ctx, int args, char *argv[]);
+
+void runtime_add_run(JSValue *global, JSContext *ctx);
 
 #endif
