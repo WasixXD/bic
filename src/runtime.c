@@ -104,13 +104,19 @@ static JSValue js_internal_run(JSContext *ctx, JSValue this_val, int argc, JSVal
     char *flags[len + 2];
 
     flags[0] = command;
+    printf("%s ", command);
     for(uint32_t i = 0; i < len; i++) {
+        if(i != 0) {
+            printf(" ");
+        }
         val = JS_GetPropertyUint32(ctx, arr, i);
         const char *str = JS_ToCString(ctx, val);
 
         flags[i + 1] = strdup(str);
+        printf("%s", str);
         JS_FreeCString(ctx, str);
     }
+    printf("\n");
 
     flags[len + 1] = NULL;
 

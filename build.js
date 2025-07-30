@@ -1,13 +1,24 @@
 
-log.info("This is a", "info log")
+
+const GCC = "gcc"
+const flags = [
+    "-I/usr/local/include/quickjs/",
+    "-Wall",
+    "-L/usr/local/lib/quickjs/",
+    "-o", "bic",  "src/runtime.h", "src/runtime.c", "src/main.c",
+    "-lquickjs", "-lm"
+]
 
 
-log.warn("This is a", "warn log")
+function main() {
 
+    log.info("Bootstraping the project!")
 
-for(let i = 0; i < args.length; i++) {
-    log.info(args[i])
+    run(GCC, flags)
+
+    // run("./main")
 }
 
 
-run("gcc", [])
+
+main()
