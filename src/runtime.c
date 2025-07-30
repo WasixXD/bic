@@ -3,6 +3,7 @@
 
 // **********************************************************
 
+// TODO: Print objects
 static int dummy_print(JSContext *ctx, int argc, JSValue *argv) {
     for(int i = 0; i < argc; i++) {
         if(i != 0) {
@@ -72,3 +73,23 @@ void runtime_add_log(JSContext *ctx) {
 
 
 // **********************************************************
+
+
+void runtime_add_args(JSContext *ctx, int _args, char *argv[]) {
+    JSValue global, args;
+
+    global = JS_GetGlobalObject(ctx);
+
+    args = JS_NewArray(ctx);
+
+
+    for(int i = 0; i < _args; i++) {
+        JSValue str = JS_NewString(ctx, argv[i]);
+        JS_DefinePropertyValueUint32(ctx, args, i, str, JS_PROP_C_W_E);
+    }
+
+
+    JS_SetPropertyStr(ctx, global, "args", args);
+    JS_FreeValue(ctx, global);
+    return;
+}

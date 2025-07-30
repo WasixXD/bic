@@ -50,8 +50,12 @@ int read_build_js(char **content) {
 
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
+    // for(int i = 0; i < argc; i++) {
+    //     printf("%s\n", argv[i]);
+    // }
+    // return 0;
     char *content;
     if(read_build_js(&content) < 0) {
         return -1;
@@ -62,7 +66,7 @@ int main() {
     JSContext *ctx     = JS_NewContext(runtime);
 
     runtime_add_log(ctx);
-    runtime_add_args(ctx);
+    runtime_add_args(ctx, argc, argv);
 
     JS_Eval(ctx, content, strlen(content), "<build>", JS_EVAL_TYPE_GLOBAL);
 

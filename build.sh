@@ -6,4 +6,4 @@ gcc -I/usr/local/include/quickjs/ \
     -o main src/*.h src/*.c \
     -lquickjs -lm
 
-./main
+./main a b c
