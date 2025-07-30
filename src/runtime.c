@@ -4,6 +4,9 @@
 #include <string.h>
 
 // TODO: Better Error Handling 
+// TODO: Run build command in another process?
+// TODO: Download packages?
+// TODO: Watch Command?
 
 // **********************************************************
 
