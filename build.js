@@ -11,12 +11,14 @@ const flags = [
 
 
 function main() {
-
-    log.info("Bootstraping the project!")
+    
+    log.info("Bootstraping the project")
 
     run(GCC, flags)
-
-    // run("./main")
+    if(args[1] == "run") {
+        log.info("Running")
+        run("./main", [...args])
+    }
 }
 
 
