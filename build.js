@@ -1,3 +1,5 @@
 
+log.info("This is a", "info log")
 
-"Hello, World!"
+
+log.warn("This is a", "warn log")

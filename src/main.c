@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <malloc.h>
 #include "runtime.h"
+#include <string.h>
 
 #define BUILD_SRC "build.js"
 #define BUILD_PATH_SIZE FILENAME_MAX + sizeof(BUILD_SRC)
@@ -56,6 +57,20 @@ int main() {
         return -1;
     }
 
+
+    JSRuntime *runtime = JS_NewRuntime();
+    JSContext *ctx     = JS_NewContext(runtime);
+
+    runtime_add_log(ctx);
+    runtime_add_args(ctx);
+
+    JS_Eval(ctx, content, strlen(content), "<build>", JS_EVAL_TYPE_GLOBAL);
+
+    if(JS_HasException(ctx)) {
+        JSValue exception = JS_GetException(ctx);
+        const char *err_str = JS_ToCString(ctx, exception);
+        perror(err_str);
+    }
     free(content);
     return 0;
 }
