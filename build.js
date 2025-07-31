@@ -1,5 +1,3 @@
-
-
 const GCC = "gcc"
 const sources = ["src/runtime.h", "src/runtime.c", "src/main.c"]
 const flags = [
@@ -9,7 +7,6 @@ const flags = [
     "-o", "bic",  ...sources,
     "-lquickjs", "-lm"
 ]
-
 
 function main() {
     
@@ -21,7 +18,3 @@ function main() {
         run("./main", [...args])
     }
 }
-
-
-
-main()

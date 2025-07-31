@@ -2,6 +2,10 @@
 #include <quickjs.h>
 #include <unistd.h>
 #include <string.h>
+#include <dirent.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 // TODO: Better Error Handling 
 // TODO: Run build command in another process?
@@ -135,5 +139,59 @@ void runtime_add_run(JSValue *global, JSContext *ctx) {
     JSValue run = JS_NewCFunction(ctx, js_internal_run, "run", 1);
 
     JS_SetPropertyStr(ctx, *global, "run", run);
+    return;
+}
+
+// **********************************************************
+
+
+static JSValue js_fs_folderExists(JSContext *ctx, JSValue this_val, int argc, JSValue *argv) {
+    const char *path = JS_ToCString(ctx, argv[0]);
+
+    if(!path) {
+        return JS_EXCEPTION;
+    }
+
+    DIR *dir = opendir(path);
+
+    JS_FreeCString(ctx, path);
+
+    if(dir) {
+        return JS_NewBool(ctx, 1);
+    }
+
+    return JS_NewBool(ctx, 0);
+}
+
+static JSValue js_fs_folderCreate(JSContext *ctx, JSValue this_val, int argc, JSValue *argv) {
+    const char *path = JS_ToCString(ctx, argv[0]);
+
+    if(!path) {
+        return JS_EXCEPTION;
+    }
+
+    if(mkdir(path, 0777) == 0) {
+        return JS_NewBool(ctx, 1);
+    }
+
+    JS_FreeCString(ctx, path);
+
+    return JS_NewBool(ctx, 0);
+}
+void runtime_add_fs(JSValue *global, JSContext *ctx) {
+
+    JSValue fs = JS_NewObject(ctx);
+
+
+    JS_SetPropertyStr(ctx, fs, "folderExists", JS_NewCFunction(ctx, js_fs_folderExists, "folderExists", 1));
+    JS_SetPropertyStr(ctx, fs, "folderCreate", JS_NewCFunction(ctx, js_fs_folderCreate, "folderCreate", 1));
+
+    // LINUX ONLY?
+    const char *home_path = getenv("HOME");
+    JSValue home = JS_NewString(ctx, home_path);
+
+    JS_SetPropertyStr(ctx, *global, "HOME", home);
+    JS_SetPropertyStr(ctx, *global, "fs", fs);
+
     return;
 }

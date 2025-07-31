@@ -17,4 +17,6 @@ void runtime_add_args(JSValue *global, JSContext *ctx, int args, char *argv[]);
 
 void runtime_add_run(JSValue *global, JSContext *ctx);
 
+void runtime_add_fs(JSValue *globa, JSContext *ctx);
+
 #endif

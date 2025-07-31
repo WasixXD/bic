@@ -14,7 +14,7 @@ const flags = [
     "-Wall",
     `-I${HOME}/dev/quickjs/`,  // HOME is a macro that expands to /home/your_user
     "-o", "build/main", 
-    ...source
+    ...sources
 ]
 
 function main() {

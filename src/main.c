@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
     runtime_add_log(&global, ctx);
     runtime_add_args(&global, ctx, argc, argv);
     runtime_add_run(&global, ctx);
+    runtime_add_fs(&global, ctx);
 
     JS_FreeValue(ctx, global);
     
